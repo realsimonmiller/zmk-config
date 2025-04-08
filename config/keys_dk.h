@@ -25,6 +25,8 @@
 
 #pragma once
 #include "keycodes.h"
+#include <dt-bindings/zmk/keys.h>
+
 // clang-format off
 
 // Aliases
