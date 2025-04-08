@@ -48,7 +48,34 @@
         };
     };
 
-    combos { compatible = "zmk,combos"; };
+    combos {
+        compatible = "zmk,combos";
+
+        ctrlback {
+            bindings = <&kp LC(BACKSPACE)>;
+            key-positions = <16 17 18>;
+        };
+
+        ctrldel {
+            bindings = <&kp LC(DEL)>;
+            key-positions = <27 28 29>;
+        };
+
+        delete {
+            bindings = <&kp DELETE>;
+            key-positions = <28 29>;
+        };
+
+        backspace {
+            bindings = <&kp BACKSPACE>;
+            key-positions = <17 18>;
+        };
+
+        caps_esc {
+            bindings = <&kp CAPS>;
+            key-positions = <15 14>;
+        };
+    };
 
     keymap {
         compatible = "zmk,keymap";
