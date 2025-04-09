@@ -16,7 +16,7 @@ jobs:
           submodules: recursive
 
       - name: Set up west and deps
-        uses: zmkfirmware/action-setup-west@v1
+        uses: zmkfirmware/action-setup-west@main  # <-- changed from @v1 to @main
 
       - name: Fetch ZMK firmware repo
         uses: actions/checkout@v3
@@ -27,4 +27,4 @@ jobs:
           submodules: recursive
 
       - name: Build using build.yaml
-        uses: zmkfirmware/action-build@v1
+        uses: zmkfirmware/action-build@main        # <-- changed from @v1 to @main
