@@ -96,29 +96,19 @@
         };
 
         // -----------------------------------------
-        // Nav Layer (Brackets now typed via AltGr combos on Danish)
+        // Nav Layer (Brackets via AltGr combos on Danish)
         // -----------------------------------------
         Nav {
             display-name = "Nav";
             bindings = <
-              // TILDE (US) => We'll replace with a dead-tilde in DK: altGr+¨ => "~"
-              // If you really need a direct "~", you'd likely need a macro,
-              // but this minimal fix uses altGr+¨ => a dead ~.
+              // TILDE (US) => altGr+¨ => "~" on DK
               &kp RALT DIAE   &trans     &kp UP_ARROW  &trans  
+              &kp RALT N8     &kp RALT N9  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp NUMBER_0
+              &kp LEFT_SHIFT  &kp LEFT    &kp DOWN      &kp RIGHT  
+              &kp RALT N7     &kp RALT N0  &kp NUMBER_4  &kp NUMBER_5  &kp NUMBER_6  &kp MINUS
 
-              // LBRC => US '[' => We'll replace with altGr+8 => '[' in Danish
-              &kp RALT N8     &kp RALT N9 // RBRC => US ']' => altGr+9 => ']' in Danish
-
-              &kp NUMBER_7   &kp NUMBER_8  &kp NUMBER_9  &kp NUMBER_0
-
-              &kp LEFT_SHIFT &kp LEFT     &kp DOWN      &kp RIGHT  
-
-              // LBKT => US '{' => altGr+7 => '{' in Danish
-              // RBKT => US '}' => altGr+0 => '}' in Danish
-              &kp RALT N7     &kp RALT N0   &kp NUMBER_4  &kp NUMBER_5  &kp NUMBER_6  &kp MINUS
-
-&kp LEFT_ALT  &kp LEFT_WIN   &kp MINUS  &trans    &kp PLUS   &kp LPAR    &kp RPAR  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp KP_MULTIPLY  &kp PLUS
-                                         &trans    &trans     &trans      &trans    &trans        &kp DOT
+&kp LEFT_ALT  &kp LEFT_WIN  &kp MINUS  &trans  &kp PLUS   &kp LPAR  &kp RPAR  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp KP_MULTIPLY  &kp PLUS
+                                     &trans   &trans     &trans    &trans    &trans        &kp DOT
             >;
         };
 
@@ -128,17 +118,12 @@
         Sym {
             display-name = "Sym";
             bindings = <
-                // !, #, %, etc. are OK in DK with SHIFT combos
-                &kp EXCL  
-                // '@' => altGr+2 in DK, so we do RA(N2)
-                &kp RA(N2)      
-                &kp HASH  
-                // '$' => altGr+4 in DK
-                &kp RA(N4)      
-                &kp PERCENT     
+                &kp EXCL
+                &kp RALT N2  // '@' => AltGr+2 on DK
+                &kp HASH
+                &kp RALT N4  // '$' => AltGr+4 on DK
+                &kp PERCENT
 
-                // '^', '&', '*' etc. could also need altGr combos or macros,
-                // but let's do minimal changes:
                 &kp CARET
                 &kp AMPERSAND
                 &kp KP_ASTERISK
@@ -184,15 +169,18 @@
         };
 
         // -----------------------------------------
-        // Gaming+ Layer (unchanged)
+        // Gaming+ Layer (fixed parentheses)
         // -----------------------------------------
         Gaming+ {
             display-name = "Game+";
             bindings = <
-        &kp F10  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp T     &kp RA(RC(Y))  &kp RA(RC(U))  &trans  &trans  &kp LC(RA(DEL))
-        &kp L    &kp O         &kp Y         &kp K         &kp G     &kp F5         &trans         &trans  &trans  &trans
-&trans  &to 0    &trans        &trans        &trans        &trans    &trans         &trans         &trans  &trans  &trans           &kp LA(F4)
-                               &kp J         &kp I         &kp M     &trans         &trans         &trans
+        &kp F10  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp T
+        &kp RALT RCTRL Y       &kp RALT RCTRL U   &trans   &trans  &kp LCTRL RALT DEL
+
+        &kp L     &kp O        &kp Y         &kp K    &kp G    &kp F5   &trans  &trans  &trans  &trans
+&trans  &to 0    &trans       &trans        &trans   &trans  &trans  &trans  &trans  &trans  &trans
+                              &kp J         &kp I    &kp M    &trans  &trans  &trans
+
             >;
         };
 
