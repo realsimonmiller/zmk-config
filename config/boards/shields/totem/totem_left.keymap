@@ -1,0 +1,9 @@
+/ {
+    keymap {
+        compatible = "zmk,keymap";
+
+        base_layer {
+            bindings = < &trans &trans &trans &trans &trans >;
+        };
+    };
+};
