@@ -7,4 +7,21 @@ on:
 
 jobs:
   build:
-    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout ZMK config
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Fetch ZMK firmware
+        uses: actions/checkout@v3
+        with:
+          repository: zmkfirmware/zmk
+          path: zmk
+          ref: main
+          submodules: recursive
+
+      - name: Build using build.yaml
+        uses: zmkfirmware/action-build@main
