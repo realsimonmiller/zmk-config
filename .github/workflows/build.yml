@@ -1,0 +1,30 @@
+name: Build ZMK Locally
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout ZMK config
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Set up west and deps
+        uses: zmkfirmware/action-setup-west@v1
+
+      - name: Fetch ZMK firmware repo
+        uses: actions/checkout@v3
+        with:
+          repository: zmkfirmware/zmk
+          path: zmk
+          ref: main
+          submodules: recursive
+
+      - name: Build using build.yaml
+        uses: zmkfirmware/action-build@v1
