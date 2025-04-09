@@ -1,4 +1,5 @@
 //
+//
 //                                                        ▀▀▀▀▀     ▀▀▀▀▀          ▀▀█▀▀
 //                                                        ▄▀▀▀▄  ▄  ▄▀▀▀▄  ▄  ▄▀▀▀▄  █  ▄▀▀▀▄
 //                                                        █   █  █  █   █  █  █   █  █  █   █
@@ -7,6 +8,7 @@
 //                                                               ▀      █  █  █     █▄█
 //                                                             ▀▀▀▀▀    █  █  █      ▀
 //                                                                      ▀  ▀  ▀
+//
 //
 // ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 
@@ -80,36 +82,84 @@
     keymap {
         compatible = "zmk,keymap";
 
+        // -----------------------------------------
+        // Base Layer (Æ/Ø/Å on a Danish OS)
+        // -----------------------------------------
         Base {
             display-name = "Base";
             bindings = <
-              &kp Q       &kp W       &kp E          &kp R         &kp T        &kp Y    &kp U        &kp I        &kp O       &kp P
-              &hm LGUI A  &hm LALT S  &hm LCTRL D    &hm LSHIFT F  &kp G        &kp H    &hm RSHFT J  &hm RCTRL K  &hm RALT L  &hm RGUI SEMICOLON
-&lt 3 ESCAPE  &kp Z       &kp X       &kp C          &kp V         &kp B        &kp N    &kp M        &kp COMMA    &kp DOT     &kp LEFT_BRACKET    &kp SINGLE_QUOTE
+              &kp Q       &kp W       &kp E          &kp R         &kp T        &kp Y    &kp U        &kp I        &kp O         &kp P
+              &hm LGUI A  &hm LALT S  &hm LCTRL D    &hm LSHIFT F  &kp G        &kp H    &hm RSHFT J  &hm RCTRL K  &hm RALT L    &hm RGUI SEMICOLON // = "Æ" on DK
+&lt 3 ESCAPE  &kp Z       &kp X       &kp C          &kp V         &kp B        &kp N    &kp M        &kp COMMA    &kp DOT       &kp LEFT_BRACKET    &kp SINGLE_QUOTE // "[" => "Å", "'" => "Ø" on DK
                                       &mt LCTRL DEL  &lt 1 TAB     &kp SPACE    &kp RET  &lt 2 BSPC   &kp MINUS
             >;
         };
 
+        // -----------------------------------------
+        // Nav Layer (Brackets now typed via AltGr combos on Danish)
+        // -----------------------------------------
         Nav {
             display-name = "Nav";
             bindings = <
-              &kp TILDE       &trans     &kp UP_ARROW  &trans     &kp LBRC    &kp RBRC  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp NUMBER_0
-              &kp LEFT_SHIFT  &kp LEFT   &kp DOWN      &kp RIGHT  &kp LBKT    &kp RBKT  &kp NUMBER_4  &kp NUMBER_5  &kp NUMBER_6  &kp MINUS
-&kp LEFT_ALT  &kp LEFT_WIN    &kp MINUS  &trans        &kp PLUS   &kp LPAR    &kp RPAR  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp KP_MULTIPLY  &kp PLUS
-                                         &trans        &trans     &trans      &trans    &trans        &kp DOT
+              // TILDE (US) => We'll replace with a dead-tilde in DK: altGr+¨ => "~"
+              // If you really need a direct "~", you'd likely need a macro,
+              // but this minimal fix uses altGr+¨ => a dead ~.
+              &kp RA(DIAE)   &trans     &kp UP_ARROW  &trans  
+
+              // LBRC => US '[' => We'll replace with altGr+8 => '[' in Danish
+              &kp RA(N8)     &kp RA(N9) // RBRC => US ']' => altGr+9 => ']' in Danish
+
+              &kp NUMBER_7   &kp NUMBER_8  &kp NUMBER_9  &kp NUMBER_0
+
+              &kp LEFT_SHIFT &kp LEFT     &kp DOWN      &kp RIGHT  
+
+              // LBKT => US '{' => altGr+7 => '{' in Danish
+              // RBKT => US '}' => altGr+0 => '}' in Danish
+              &kp RA(N7)     &kp RA(N0)   &kp NUMBER_4  &kp NUMBER_5  &kp NUMBER_6  &kp MINUS
+
+&kp LEFT_ALT  &kp LEFT_WIN   &kp MINUS  &trans    &kp PLUS   &kp LPAR    &kp RPAR  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp KP_MULTIPLY  &kp PLUS
+                                         &trans    &trans     &trans      &trans    &trans        &kp DOT
             >;
         };
 
+        // -----------------------------------------
+        // Sym Layer (Minimal fixes for @ and $ on Danish)
+        // -----------------------------------------
         Sym {
             display-name = "Sym";
             bindings = <
-                &kp EXCL  &kp AT  &kp HASH  &kp DOLLAR  &kp PERCENT    &kp CARET  &kp AMPERSAND  &kp KP_ASTERISK  &kp SQT  &kp DQT
-                &trans    &trans  &trans    &trans      &trans         &trans     &trans         &trans           &trans   &trans
-&studio_unlock  &trans    &trans  &trans    &trans      &trans         &kp UNDER  &kp EQUAL      &trans           &trans   &kp SLASH  &kp HOME
-                                  &trans    &trans      &trans         &trans     &trans         &trans
+                // !, #, %, etc. are OK in DK with SHIFT combos
+                &kp EXCL  
+                // '@' => altGr+2 in DK, so we do RA(N2)
+                &kp RA(N2)      
+                &kp HASH  
+                // '$' => altGr+4 in DK
+                &kp RA(N4)      
+                &kp PERCENT     
+
+                // '^', '&', '*' etc. could also need altGr combos or macros,
+                // but let's do minimal changes:
+                &kp CARET
+                &kp AMPERSAND
+                &kp KP_ASTERISK
+                &kp SQT
+                &kp DQT
+
+                &trans    &trans  &trans    &trans      &trans
+                &trans     &trans  &trans    &trans      &trans
+
+&studio_unlock  &trans    &trans  &trans    &trans      &trans  
+                &kp UNDER  &kp EQUAL      &trans       &trans  
+                &kp SLASH  &kp HOME
+
+                                  &trans    &trans      &trans
+                                  &trans    &trans      &trans
             >;
         };
 
+        // -----------------------------------------
+        // Fun Layer (unchanged)
+        // -----------------------------------------
         Fun {
             display-name = "Fun";
             bindings = <
@@ -120,6 +170,9 @@
             >;
         };
 
+        // -----------------------------------------
+        // Gaming Layer (unchanged)
+        // -----------------------------------------
         Gaming {
             display-name = "Game";
             bindings = <
@@ -130,6 +183,9 @@
             >;
         };
 
+        // -----------------------------------------
+        // Gaming+ Layer (unchanged)
+        // -----------------------------------------
         Gaming+ {
             display-name = "Game+";
             bindings = <
@@ -140,6 +196,9 @@
             >;
         };
 
+        // -----------------------------------------
+        // layer_6 (unused placeholder)
+        // -----------------------------------------
         layer_6 {
             bindings = <
         &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
