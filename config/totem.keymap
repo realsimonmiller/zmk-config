@@ -104,10 +104,10 @@
               // TILDE (US) => We'll replace with a dead-tilde in DK: altGr+¨ => "~"
               // If you really need a direct "~", you'd likely need a macro,
               // but this minimal fix uses altGr+¨ => a dead ~.
-              &kp RA(DIAE)   &trans     &kp UP_ARROW  &trans  
+              &kp RALT DIAE   &trans     &kp UP_ARROW  &trans  
 
               // LBRC => US '[' => We'll replace with altGr+8 => '[' in Danish
-              &kp RA(N8)     &kp RA(N9) // RBRC => US ']' => altGr+9 => ']' in Danish
+              &kp RALT N8     &kp RALT N9 // RBRC => US ']' => altGr+9 => ']' in Danish
 
               &kp NUMBER_7   &kp NUMBER_8  &kp NUMBER_9  &kp NUMBER_0
 
@@ -115,7 +115,7 @@
 
               // LBKT => US '{' => altGr+7 => '{' in Danish
               // RBKT => US '}' => altGr+0 => '}' in Danish
-              &kp RA(N7)     &kp RA(N0)   &kp NUMBER_4  &kp NUMBER_5  &kp NUMBER_6  &kp MINUS
+              &kp RALT N7     &kp RALT N0   &kp NUMBER_4  &kp NUMBER_5  &kp NUMBER_6  &kp MINUS
 
 &kp LEFT_ALT  &kp LEFT_WIN   &kp MINUS  &trans    &kp PLUS   &kp LPAR    &kp RPAR  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp KP_MULTIPLY  &kp PLUS
                                          &trans    &trans     &trans      &trans    &trans        &kp DOT
