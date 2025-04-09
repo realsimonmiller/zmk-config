@@ -1,2 +1,2 @@
 config ZMK_KEYMAP_TOTEM_LEFT
-    bool "Totem Left Keymap"
+    bool "Totem Left keymap"
