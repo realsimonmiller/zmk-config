@@ -65,10 +65,10 @@
         Nav {
             display-name = "Nav";
             bindings = <
-              &kp RA(RBRC)    &trans     &kp UP_ARROW  &trans     &kp RA(LBRC)    &kp RA(N0)  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp NUMBER_0
-              &kp LEFT_SHIFT  &kp LEFT   &kp DOWN      &kp RIGHT  &kp RA(N8)      &kp RA(N9)  &kp NUMBER_4  &kp NUMBER_5  &kp NUMBER_6  &kp SLASH
-&kp LEFT_ALT  &kp LEFT_WIN    &kp MINUS  &trans        &kp PLUS   &kp LPAR        &kp RPAR    &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp KP_MULTIPLY  &kp KP_MINUS
-                                         &trans        &trans     &trans          &trans      &trans        &kp DOT
+              &kp RA(RBRC)    &trans     &kp UP_ARROW  &trans     &kp RA(N7)    &kp RA(N0)            &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp NUMBER_0
+              &kp LEFT_SHIFT  &kp LEFT   &kp DOWN      &kp RIGHT  &kp RA(N8)    &kp RA(N9)            &kp NUMBER_4  &kp NUMBER_5  &kp NUMBER_6  &kp SLASH
+&kp LEFT_ALT  &kp LEFT_WIN    &kp MINUS  &trans        &kp PLUS   &kp LPAR      &kp LEFT_PARENTHESIS  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp KP_MULTIPLY  &kp KP_PLUS
+                                         &trans        &trans     &trans        &trans                &trans        &kp DOT
             >;
         };
 
@@ -95,10 +95,10 @@
         Gaming {
             display-name = "Game";
             bindings = <
-            &kp Z           &kp X  &kp C      &kp V         &sl 5     &trans  &trans  &trans  &trans  &trans
-            &kp TAB         &kp Q  &kp W      &kp E         &kp R     &trans  &trans  &trans  &trans  &trans
-&kp ESCAPE  &kp LEFT_SHIFT  &kp A  &kp S      &kp D         &kp F     &trans  &trans  &trans  &trans  &trans  &trans
-                                   &kp LCTRL  &kp LEFT_ALT  &trans    &trans  &trans  &trans
+           &kp ESC         &kp X  &kp C      &kp V         &sl 5     &trans  &trans  &trans  &trans  &trans
+           &kp TAB         &kp Q  &kp W      &kp E         &kp R     &trans  &trans  &trans  &trans  &trans
+&kp LCTRL  &kp LEFT_SHIFT  &kp A  &kp S      &kp D         &kp F     &trans  &trans  &trans  &trans  &trans  &trans
+                                  &kp LCTRL  &kp LEFT_ALT  &trans    &trans  &trans  &trans
             >;
         };
 
