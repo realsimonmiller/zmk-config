@@ -105,3 +105,10 @@ Edit: Scratch that. I finally got it to work. I tried again a couple times tryin
 10. Flash Dongle with Firmware
 
 I'm not sure what caused it to work but I'll get a chance to test it again soon since I need to update the keymap now that I know the boards are working. Thanks again :)
+
+
+----
+
+other changes:
+
+Added hm ctrl+alt+shift to space button to navigate glazewm.
