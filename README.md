@@ -83,3 +83,25 @@ Kits, Prebuilts, Parts:
 Documentation and guides:
 - [ZMK Firmware Documentation](https://zmk.dev/docs)
 - [Eren's Wireless Charybdis Mini Guide](https://github.com/erenatas/charybdis-wireless-3x6)
+
+
+note from reddit:
+
+Thanks for the insight. I'm glad to know the microcontroller isn't the issue. The only other difference I can think of are the batteries. I couldn't find 3.7V 120mAh batteries that fit the case so I ended up with 3.7V 100mAh batteries on both halves.
+
+I am using a fork of eiga's config without any changes. I used the steps in the Connection Issues page of the ZMK docs to get it working without the dongle. I've tried following those same instructions to set it up with the dongle, but the instructions aren't for a dongle setup so I can't follow them exactly. I've tried a few variations, but I can only ever get one half or the other to connect to the dongle. I've also tried using the [Reset Instructions with Dongle](https://docs.slicemk.com/firmware/zmk/wireless/nvsclear/) steps (and some variations) from the SliceMK ZMK page I ran across looking for a solution (using the uf2 files from the fork instead of the ones mentioned in those instructions), but I keep running into the same issue of only being able to connect one half to the dongle.
+
+Edit: Scratch that. I finally got it to work. I tried again a couple times trying to combine the Reset Instructions with/without Dongle steps from the SliceMK page. What finally seemed to work was
+
+1. Flash Dongle w/ settings reset
+2. Flash Left w/ settings reset (power On)
+3. Flash Right w/ settings reset (power On)
+4. Flash Right with firmware
+5. Press Right Reset Button
+6. Wait 20 seconds
+7. Flash Left with firmware
+8. Press Left Reset Button
+9. Wait 20 seconds
+10. Flash Dongle with Firmware
+
+I'm not sure what caused it to work but I'll get a chance to test it again soon since I need to update the keymap now that I know the boards are working. Thanks again :)
