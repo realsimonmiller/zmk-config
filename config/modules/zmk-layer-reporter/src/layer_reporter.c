@@ -17,6 +17,7 @@
 #include <zmk/battery.h>
 #include <zmk/hid.h>
 #include <zmk/keymap.h>
+#include <zmk/matrix.h>
 #include <zmk/split/central.h>
 #include <zmk/usb.h>
 
