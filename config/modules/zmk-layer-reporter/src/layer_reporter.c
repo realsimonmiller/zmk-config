@@ -12,7 +12,6 @@
 #include <zmk/event_manager.h>
 #include <zmk/events/battery_state_changed.h>
 #include <zmk/events/layer_state_changed.h>
-#include <zmk/events/peripheral_battery_state_changed.h>
 #include <zmk/events/position_state_changed.h>
 #include <zmk/events/usb_conn_state_changed.h>
 #include <zmk/battery.h>
