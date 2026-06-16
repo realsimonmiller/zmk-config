@@ -12,12 +12,5 @@ manifest:
     - name: zmk-raw-hid
       remote: zzeneg
       revision: main
-    # Local module staged in this repo at config/modules/zmk-layer-reporter.
-    # west requires a cloneable git source for the file:// URL; the CI workflow
-    # runs `git init` on the module dir before `west update`.
-    - name: zmk-layer-reporter
-      path: modules/zmk-layer-reporter
-      url: file://config/modules/zmk-layer-reporter
-      revision: main
   self:
     path: config

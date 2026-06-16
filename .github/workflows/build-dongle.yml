@@ -66,31 +66,14 @@ jobs:
       - name: Install west
         run: pip install west
 
-      # ── 3. Prime zmk-layer-reporter as a local git repo ──────────────────────
-      #    west requires every project URL to be a cloneable git source.
-      #    config/west.yml lists zmk-layer-reporter with:
-      #      url: file://config/modules/zmk-layer-reporter
-      #    The module files are committed to this repo but not as an independent
-      #    git repo; initialise one here so `west update` can clone from the
-      #    file:// URL.  (The throw-away history is never pushed anywhere.)
-      - name: Init zmk-layer-reporter as local git repo (west file:// source)
-        run: |
-          git -C config/modules/zmk-layer-reporter init
-          git -C config/modules/zmk-layer-reporter add -A
-          git -C config/modules/zmk-layer-reporter \
-              -c user.name="ci" -c user.email="ci@ci.local" \
-              commit --quiet -m "init zmk-layer-reporter module"
-
       # ── 4. West workspace ─────────────────────────────────────────────────────
-      #    `west init -l config` treats config/west.yml as the manifest.
-      #    `west update` fetches:
-      #       • ZMK (zmkfirmware/zmk, main)
-      #       • zmk-raw-hid (zzeneg/zmk-raw-hid, main)   ← adds RAW HID transport
-      #       • zmk-layer-reporter (local file://, main)  ← layer-event reporter
+      #    zmk-layer-reporter is a local Zephyr module passed to the build via
+      #    -DZMK_EXTRA_MODULES (step 7), NOT a west project, so west does not try
+      #    to clone it. `west update` fetches ZMK and zmk-raw-hid only.
       - name: West init (manifest = config/west.yml)
         run: west init -l config
 
-      - name: West update (ZMK + zmk-raw-hid + zmk-layer-reporter)
+      - name: West update (ZMK + zmk-raw-hid)
         run: west update
 
       - name: Export Zephyr CMake package
@@ -166,6 +149,7 @@ jobs:
             -b seeeduino_xiao_ble \
             -- \
             -DZMK_CONFIG="$(pwd)/config" \
+            -DZMK_EXTRA_MODULES="$(pwd)/config/modules/zmk-layer-reporter" \
             -DSHIELD="totem_dongle studio-rpc-usb-uart" \
             -DCONFIG_ZMK_STUDIO=y
 
