@@ -104,27 +104,26 @@ jobs:
         run: pip install cmake ninja pyelftools
 
       # ── 6. Preprocess totem.keymap → totem.keymap.preprocessed ───────────────
-      #    Produces the authoritative vendored artifact consumed by:
-      #      • T4 (initial keymap data seeding in totem/keymap-data/)
-      #      • T20 (re-import when the keymap changes)
+      #    Produces the vendored artifact consumed by the layer-viewer's keymap
+      #    parser (it keys on raw ZMK keycode names, e.g. SEMICOLON / NUMBER_7,
+      #    not on expanded dt-binding macros).
       #
-      #    Devicetree quirk: '#binding-cells' begins with '#' which cpp treats
-      #    as a preprocessor directive. Escape before cpp, restore afterwards.
-      #
-      #    Include paths:
-      #      -I config                         local headers (keys_dk.h, etc.)
-      #      -I config/boards/shields/totem    shield-specific headers
-      #      -I zmk/app/include                ZMK binding dt-bindings
-      #      -I zmk/app/dts                    ZMK device tree sources
+      #    Two devicetree/cpp quirks must be handled:
+      #      1. ZMK's angle-bracket `#include <...>` headers transitively pull in
+      #         behavior .dtsi files containing `#binding-cells`, which cpp reads
+      #         as an invalid directive. We are NOT compiling firmware here, only
+      #         flattening keycodes, so strip angle-bracket includes and run with
+      #         -nostdinc so cpp never descends into ZMK's dts tree.
+      #      2. `#binding-cells` in the keymap itself also starts with '#'; escape
+      #         it before cpp and restore it afterwards.
       - name: Preprocess totem.keymap
         run: |
-          sed 's/#binding-cells/@@binding-cells@@/g' \
+          sed -e '/^[[:space:]]*#include[[:space:]]*</d' \
+              -e 's/#binding-cells/@@binding-cells@@/g' \
               config/totem.keymap > /tmp/totem.keymap.in
-          cpp -P \
+          cpp -P -nostdinc \
             -I config \
             -I config/boards/shields/totem \
-            -I zmk/app/include \
-            -I zmk/app/dts \
             /tmp/totem.keymap.in \
             -o /tmp/totem.keymap.out
           sed 's/@@binding-cells@@/#binding-cells/g' \
