@@ -101,7 +101,7 @@ jobs:
         run: /opt/zephyr-sdk/setup.sh -c
 
       - name: Install host build tools
-        run: pip install cmake ninja pyelftools
+        run: pip install cmake ninja pyelftools protobuf grpcio-tools
 
       # protoc is required to build ZMK Studio's protobuf RPC layer
       # (the studio-rpc-usb-uart snippet). The official ZMK build image ships
