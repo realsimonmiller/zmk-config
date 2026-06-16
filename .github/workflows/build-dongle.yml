@@ -1,0 +1,177 @@
+# build-dongle.yml
+# ═══════════════════════════════════════════════════════════════════════════
+# Build Totem ZMK Dongle Firmware — GitHub Actions Workflow
+#
+# PLACE THIS FILE AT:  .github/workflows/build-dongle.yml
+# in your zmk-config repository on branch `totem-dongle`.
+#
+# TRIGGER
+#   • push to `totem-dongle` branch
+#   • workflow_dispatch  (Actions tab → "Build Totem Dongle" → Run workflow)
+#
+# SCOPE: DONGLE ONLY
+#   Builds exactly one target:
+#     board:   seeeduino_xiao_ble
+#     shield:  totem_dongle
+#     snippet: studio-rpc-usb-uart
+#     cmake:   -DCONFIG_ZMK_STUDIO=y       (ZMK Studio / RPC-over-USB)
+#   The split halves are intentionally NOT built by this workflow.
+#   To build the halves, use the original .github/workflows/build.yml which
+#   delegates to zmkfirmware/zmk build-user-config.yml.
+#
+# PREREQUISITES (apply to the zmk-config branch before using this workflow)
+#   1. Merge totem/firmware/west.yml.fragment into config/west.yml
+#      (adds zzeneg remote + zmk-raw-hid project + zmk-layer-reporter project)
+#   2. Copy totem/firmware/zmk-layer-reporter/ to
+#      config/modules/zmk-layer-reporter/  and commit those files
+#   3. Append totem/firmware/totem_dongle.conf.fragment to
+#      config/boards/shields/totem/totem_dongle.conf
+#
+# MODULES WIRED
+#   • zmk-raw-hid  (zzeneg/zmk-raw-hid) — fetched by west from GitHub
+#   • zmk-layer-reporter (local)         — committed at config/modules/zmk-layer-reporter/
+#
+# ARTIFACTS (uploaded on every successful run, retained 90 days)
+#   • totem.keymap.preprocessed
+#       cpp-expanded keymap (authoritative vendored data for T4 initial seed
+#       and T20 re-import when the keymap changes)
+#   • zmk-seeeduino_xiao_ble-totem_dongle
+#       contains zmk.uf2 — flash to the dongle via UF2 boot loader
+# ═══════════════════════════════════════════════════════════════════════════
+
+name: Build Totem Dongle
+
+on:
+  push:
+    branches:
+      - totem-dongle
+  workflow_dispatch:
+
+jobs:
+  build-dongle:
+    name: Preprocess keymap + build dongle firmware
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout ──────────────────────────────────────────────────────────
+      - name: Checkout zmk-config
+        uses: actions/checkout@v4
+
+      # ── 2. Python + west ─────────────────────────────────────────────────────
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install west
+        run: pip install west
+
+      # ── 3. Prime zmk-layer-reporter as a local git repo ──────────────────────
+      #    west requires every project URL to be a cloneable git source.
+      #    config/west.yml lists zmk-layer-reporter with:
+      #      url: file://config/modules/zmk-layer-reporter
+      #    The module files are committed to this repo but not as an independent
+      #    git repo; initialise one here so `west update` can clone from the
+      #    file:// URL.  (The throw-away history is never pushed anywhere.)
+      - name: Init zmk-layer-reporter as local git repo (west file:// source)
+        run: |
+          git -C config/modules/zmk-layer-reporter init
+          git -C config/modules/zmk-layer-reporter add -A
+          git -C config/modules/zmk-layer-reporter \
+              -c user.name="ci" -c user.email="ci@ci.local" \
+              commit --quiet -m "init zmk-layer-reporter module"
+
+      # ── 4. West workspace ─────────────────────────────────────────────────────
+      #    `west init -l config` treats config/west.yml as the manifest.
+      #    `west update` fetches:
+      #       • ZMK (zmkfirmware/zmk, main)
+      #       • zmk-raw-hid (zzeneg/zmk-raw-hid, main)   ← adds RAW HID transport
+      #       • zmk-layer-reporter (local file://, main)  ← layer-event reporter
+      - name: West init (manifest = config/west.yml)
+        run: west init -l config
+
+      - name: West update (ZMK + zmk-raw-hid + zmk-layer-reporter)
+        run: west update
+
+      - name: Export Zephyr CMake package
+        run: west zephyr-export
+
+      # ── 5. Zephyr SDK (arm-zephyr-eabi) ──────────────────────────────────────
+      - name: Cache Zephyr SDK
+        id: cache-zephyr-sdk
+        uses: actions/cache@v4
+        with:
+          path: /opt/zephyr-sdk
+          key: zephyr-sdk-0.16.5-arm-zephyr-eabi
+
+      - name: Download and install Zephyr SDK 0.16.5 (arm-zephyr-eabi)
+        if: steps.cache-zephyr-sdk.outputs.cache-hit != 'true'
+        run: |
+          wget -qO /tmp/zephyr-sdk.tar.xz \
+            "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.5/zephyr-sdk-0.16.5_linux-x86_64_minimal.tar.xz"
+          mkdir -p /opt/zephyr-sdk
+          tar xf /tmp/zephyr-sdk.tar.xz -C /opt/zephyr-sdk --strip-components=1
+          /opt/zephyr-sdk/setup.sh -t arm-zephyr-eabi -h -c
+
+      # Re-register cmake package entries even on a cache hit (paths may shift).
+      - name: Register Zephyr SDK cmake packages
+        run: /opt/zephyr-sdk/setup.sh -c
+
+      - name: Install host build tools
+        run: pip install cmake ninja pyelftools
+
+      # ── 6. Preprocess totem.keymap → totem.keymap.preprocessed ───────────────
+      #    Produces the authoritative vendored artifact consumed by:
+      #      • T4 (initial keymap data seeding in totem/keymap-data/)
+      #      • T20 (re-import when the keymap changes)
+      #
+      #    Devicetree quirk: '#binding-cells' begins with '#' which cpp treats
+      #    as a preprocessor directive. Escape before cpp, restore afterwards.
+      #
+      #    Include paths:
+      #      -I config                         local headers (keys_dk.h, etc.)
+      #      -I config/boards/shields/totem    shield-specific headers
+      #      -I zmk/app/include                ZMK binding dt-bindings
+      #      -I zmk/app/dts                    ZMK device tree sources
+      - name: Preprocess totem.keymap
+        run: |
+          sed 's/#binding-cells/@@binding-cells@@/g' \
+              config/totem.keymap > /tmp/totem.keymap.in
+          cpp -P \
+            -I config \
+            -I config/boards/shields/totem \
+            -I zmk/app/include \
+            -I zmk/app/dts \
+            /tmp/totem.keymap.in \
+            -o /tmp/totem.keymap.out
+          sed 's/@@binding-cells@@/#binding-cells/g' \
+              /tmp/totem.keymap.out > totem.keymap.preprocessed
+
+      - name: Upload totem.keymap.preprocessed artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: totem.keymap.preprocessed
+          path: totem.keymap.preprocessed
+          retention-days: 90
+
+      # ── 7. Build dongle firmware ──────────────────────────────────────────────
+      #    Board:   seeeduino_xiao_ble
+      #    Shield:  totem_dongle  (+ studio-rpc-usb-uart keeps ZMK Studio on)
+      #    CMake:   -DCONFIG_ZMK_STUDIO=y
+      #
+#    The split halves are NOT built here — dongle uf2 only.
+      - name: Build dongle firmware (seeeduino_xiao_ble / totem_dongle)
+        run: |
+          west build -s zmk/app -d build/dongle \
+            -b seeeduino_xiao_ble \
+            -- \
+            -DZMK_CONFIG="$(pwd)/config" \
+            -DSHIELD="totem_dongle studio-rpc-usb-uart" \
+            -DCONFIG_ZMK_STUDIO=y
+
+      - name: Upload dongle .uf2 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: zmk-seeeduino_xiao_ble-totem_dongle
+          path: build/dongle/zephyr/zmk.uf2
+          retention-days: 90

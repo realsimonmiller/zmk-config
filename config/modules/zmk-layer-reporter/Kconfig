@@ -1,0 +1,5 @@
+config ZMK_LAYER_REPORTER
+    bool "Totem Raw HID layer reporter"
+    depends on RAW_HID
+    help
+      Emit Totem layer-state and heartbeat reports over zzeneg/zmk-raw-hid.
