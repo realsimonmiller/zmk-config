@@ -145,11 +145,12 @@ jobs:
       - name: Build dongle firmware (seeeduino_xiao_ble / totem_dongle)
         run: |
           west build -s zmk/app -d build/dongle \
-            -b seeeduino_xiao_ble \
+            -b xiao_ble//zmk \
+            -S studio-rpc-usb-uart \
             -- \
             -DZMK_CONFIG="$(pwd)/config" \
             -DZMK_EXTRA_MODULES="$(pwd)/config/modules/zmk-layer-reporter" \
-            -DSHIELD="totem_dongle studio-rpc-usb-uart" \
+            -DSHIELD="totem_dongle" \
             -DCONFIG_ZMK_STUDIO=y
 
       - name: Upload dongle .uf2 artifact
