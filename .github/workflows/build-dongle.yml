@@ -101,13 +101,7 @@ jobs:
         run: /opt/zephyr-sdk/setup.sh -c
 
       - name: Install host build tools
-        run: pip install cmake ninja pyelftools protobuf grpcio-tools
-
-      # protoc is required to build ZMK Studio's protobuf RPC layer
-      # (the studio-rpc-usb-uart snippet). The official ZMK build image ships
-      # it; this hand-rolled workflow must install it explicitly.
-      - name: Install protoc (ZMK Studio protobuf compiler)
-        run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
+        run: pip install cmake ninja pyelftools
 
       # ── 6. Preprocess totem.keymap → totem.keymap.preprocessed ───────────────
       #    Produces the vendored artifact consumed by the layer-viewer's keymap
@@ -143,21 +137,23 @@ jobs:
           retention-days: 90
 
       # ── 7. Build dongle firmware ──────────────────────────────────────────────
-      #    Board:   seeeduino_xiao_ble
-      #    Shield:  totem_dongle  (+ studio-rpc-usb-uart keeps ZMK Studio on)
-      #    CMake:   -DCONFIG_ZMK_STUDIO=y
+      #    Board:  xiao_ble//zmk   Shield: totem_dongle   (dongle uf2 only)
       #
-#    The split halves are NOT built here — dongle uf2 only.
-      - name: Build dongle firmware (seeeduino_xiao_ble / totem_dongle)
+      #    ZMK Studio is INTENTIONALLY NOT enabled here. On nRF52840 the USB
+      #    endpoint budget (~7 IN endpoints) cannot fit keyboard HID + consumer
+      #    HID + raw-HID (HID_1) + Studio's 2x CDC-ACM at once: all interfaces
+      #    enumerate but the keyboard's IN endpoint is silently not served, so
+      #    the keyboard stops typing. Dropping Studio frees the CDC endpoints so
+      #    keyboard HID + raw-HID coexist. The layer viewer needs raw-HID; Studio
+      #    is sacrificed on the dongle (the halves' Build ZMK can keep Studio).
+      - name: Build dongle firmware (xiao_ble//zmk / totem_dongle)
         run: |
           west build -s zmk/app -d build/dongle \
             -b xiao_ble//zmk \
-            -S studio-rpc-usb-uart \
             -- \
             -DZMK_CONFIG="$(pwd)/config" \
             -DZMK_EXTRA_MODULES="$(pwd)/config/modules/zmk-layer-reporter" \
-            -DSHIELD="totem_dongle" \
-            -DCONFIG_ZMK_STUDIO=y
+            -DSHIELD="totem_dongle"
 
       - name: Upload dongle .uf2 artifact
         uses: actions/upload-artifact@v4
