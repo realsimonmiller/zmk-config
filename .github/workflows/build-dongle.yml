@@ -155,6 +155,23 @@ jobs:
             -DZMK_EXTRA_MODULES="$(pwd)/config/modules/zmk-layer-reporter" \
             -DSHIELD="totem_dongle"
 
+      # ── 7b. Verify USB composition (gate the reflash) ─────────────────────────
+      #    We disabled CDC-ACM in totem_dongle.conf to free a USB endpoint for the
+      #    raw-HID (HID_1) IN endpoint. Assert it actually took effect in the
+      #    resolved .config so we never flash a build that still ships ttyACM.
+      #    Expected: CDC-ACM OFF, USB_HID_DEVICE_COUNT=2, RAW_HID ON.
+      - name: Verify USB composition in resolved .config
+        run: |
+          CFG=build/dongle/zephyr/.config
+          echo "── USB-relevant config lines ──"
+          grep -E 'CONFIG_(USB_CDC_ACM|UART_CONSOLE|USB_UART_CONSOLE|ZMK_USB_LOGGING|USB_HID_DEVICE_COUNT|RAW_HID|USB_DEVICE_STACK|ZMK_STUDIO)\b' "$CFG" || true
+          echo "── assertions ──"
+          fail=0
+          if grep -q '^CONFIG_USB_CDC_ACM=y' "$CFG"; then echo "FAIL: USB_CDC_ACM still enabled"; fail=1; else echo "OK: USB_CDC_ACM not enabled"; fi
+          if grep -q '^CONFIG_USB_HID_DEVICE_COUNT=2' "$CFG"; then echo "OK: USB_HID_DEVICE_COUNT=2"; else echo "FAIL: USB_HID_DEVICE_COUNT != 2"; fail=1; fi
+          if grep -q '^CONFIG_RAW_HID=y' "$CFG"; then echo "OK: RAW_HID enabled"; else echo "FAIL: RAW_HID not enabled"; fail=1; fi
+          exit $fail
+
       - name: Upload dongle .uf2 artifact
         uses: actions/upload-artifact@v4
         with:
