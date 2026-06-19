@@ -15,3 +15,21 @@
          , <&xiao_d 4 GPIO_ACTIVE_HIGH>
          ;
  };
+
+/*
+ * Drop the xiao_ble default USB CDC-ACM serial console (the board's
+ * cdc_acm_serial.dtsi points zephyr,console at a board_cdc_acm_uart node, which
+ * enumerates ttyACM0 and consumes a USB IN endpoint). Deleting the chosen refs
+ * is label-independent and lets CONFIG_UART_CONSOLE=n stick, so the dongle
+ * enumerates ONLY keyboard HID + raw-HID (HID_1) and the raw-HID IN endpoint is
+ * reliably serviced. Console is redirected to RTT in totem_dongle.conf.
+ */
+/ {
+    chosen {
+        /delete-property/ zephyr,console;
+        /delete-property/ zephyr,shell-uart;
+        /delete-property/ zephyr,uart-mcumgr;
+        /delete-property/ zephyr,bt-mon-uart;
+        /delete-property/ zephyr,bt-c2h-uart;
+    };
+};
